@@ -3,6 +3,11 @@ package control;
 
 import rasterize.*;
 import render.Renderer;
+import solids.Box;
+import solids.Tetrahedron;
+import transforms.Mat4;
+import transforms.Mat4RotX;
+import transforms.Mat4RotY;
 import view.Panel;
 import view.Window;
 
@@ -17,6 +22,10 @@ public class Controller2D implements Controller {
     private Renderer renderer;
 
     private LineRasterizerGraphics rasterizer;
+
+    double tempX = 0;
+    double tempY = 0;
+
 
     public Controller2D(Window window) {
         this.window = window;
@@ -36,6 +45,12 @@ public class Controller2D implements Controller {
      public void initInputs() {
         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("C"), "clear");
         panel.getActionMap().put("clear",clear);
+
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("W"), "rotX");
+         panel.getActionMap().put("rotX",rotX);
+
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("D"), "rotY");
+         panel.getActionMap().put("rotY",rotY);
      }
 
     Action clear = new AbstractAction() {
@@ -44,16 +59,24 @@ public class Controller2D implements Controller {
         }
     };
 
+    Action rotX = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            tempX += 0.1;
+            update();
+        }
+    };
+
+    Action rotY = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            tempY += 0.1;
+            update();
+        }
+    };
+
 
     @Override
     public void initListeners(Panel panel) {
 
-        window.getButtonClip().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                clip();
-            }
-        });
 
 
         panel.addMouseListener(new MouseAdapter() {
@@ -65,31 +88,7 @@ public class Controller2D implements Controller {
                 if (e.isShiftDown()) {
 
                 } else if (SwingUtilities.isLeftMouseButton(e)) {
-
-                    if (window.getRadioNewPoly().isSelected()) {
-                        polygon.points.add(new Point(e.getX(),e.getY()));
-                        update();
-
-                    } else if(window.getRadioFill().isSelected()) {
-
-                        seedFill.setSeed(new Point(e.getX(),e.getY()));
-                        seedFill.fill();
-
-                    } else if(window.getRadioClip().isSelected()) {
-                        clipPolygon.points.add(new Point(e.getX(),e.getY()));
-                        update();
-                    }
-                    else if(window.getRadioPattern().isSelected()) {
-                        seedFillPattern.setSeed(new Point(e.getX(),e.getY()));
-                        seedFillPattern.setPattern(new PatternFillDots());
-                        seedFillPattern.fill();
-                    }
-                    else if(window.getRadioPattern2().isSelected()) {
-                        seedFillPattern.setSeed(new Point(e.getX(),e.getY()));
-                        seedFillPattern.setPattern(new PatternFillLines());
-                        seedFillPattern.fill();
-                    }
-
+                    update();
 
 
 
@@ -112,7 +111,11 @@ public class Controller2D implements Controller {
 
     private void update() {
         panel.clear();
-        renderer
+        Box box = new Box(1,1,1);
+        Mat4 rotX = new Mat4RotX(tempX);
+        Mat4 rotY = new Mat4RotY(tempY);
+        renderer.setModel(rotX.mul(rotY));
+        renderer.renderSolid(box);
 
     }
 

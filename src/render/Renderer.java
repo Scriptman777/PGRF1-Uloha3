@@ -48,7 +48,7 @@ public class Renderer {
         }
 
         //Vykreslení hran
-        for(int i =0; i < solid.getIndices().size(); i=+2) {
+        for(int i = 0; i < solid.getIndices().size(); i+=2) {
             int indexA = solid.getIndices().get(i);
             int indexB = solid.getIndices().get(i+1);
             Vertex a = transformedVerts.get(indexA);
@@ -80,8 +80,8 @@ public class Renderer {
 
         int x1 = (int) ((va.getX() + 1)*(raster.getWidth() - 1)/2);
         int x2 = (int) ((vb.getX() + 1)*(raster.getWidth() - 1)/2);
-        int y1 = (int) (1 - (va.getY())*(raster.getHeight() - 1)/2);
-        int y2 = (int) (1 - (vb.getY())*(raster.getHeight() - 1)/2);
+        int y1 = (int) ((1 - va.getY())*(raster.getHeight() - 1)/2);
+        int y2 = (int) ((1 - vb.getY())*(raster.getHeight() - 1)/2);
         lineRasterizer.drawLine(x1,y1,x2,y2);
 
 
