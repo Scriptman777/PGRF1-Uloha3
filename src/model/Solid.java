@@ -37,7 +37,7 @@ public class Solid {
     public Solid(Color color) {
         vertices = new ArrayList<>();
         indices = new ArrayList<>();
-        this.color = color;
+        this.setColor(color);
         transform = new Mat4Identity();
     }
 
@@ -51,6 +51,10 @@ public class Solid {
 
     public Color getColor() {
         return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     public double getRotX() {
@@ -146,4 +150,6 @@ public class Solid {
     public Mat4 getTransform(){
         return transform;
     }
+
+
 }
