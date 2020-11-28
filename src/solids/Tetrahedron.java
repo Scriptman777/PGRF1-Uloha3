@@ -3,10 +3,12 @@ package solids;
 import model.Solid;
 import model.Vertex;
 
+import java.awt.*;
+
 public class Tetrahedron extends Solid {
 
-    public Tetrahedron() {
-        super();
+    public Tetrahedron(Color color) {
+        super(color);
         getVertices().add(new Vertex(0,0,0)); //0
         getVertices().add(new Vertex(1,0,0)); //1
         getVertices().add(new Vertex(0,1,0)); //2

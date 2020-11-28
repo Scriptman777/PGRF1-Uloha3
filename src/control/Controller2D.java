@@ -1,6 +1,7 @@
 package control;
 
 
+import model.Scene;
 import rasterize.*;
 import render.Renderer;
 import solids.Box;
@@ -20,6 +21,7 @@ public class Controller2D implements Controller {
     private final Panel panel;
     private final Window window;
     private Renderer renderer;
+    private Scene scene;
 
     private LineRasterizerGraphics rasterizer;
 
@@ -39,6 +41,7 @@ public class Controller2D implements Controller {
     public void initObjects(Raster raster) {
         rasterizer = new LineRasterizerGraphics(raster);
         renderer = new render.Renderer(rasterizer,raster);
+        scene = new Scene();
 
      }
 
@@ -98,8 +101,6 @@ public class Controller2D implements Controller {
 
 
 
-
-
         panel.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -111,11 +112,17 @@ public class Controller2D implements Controller {
 
     private void update() {
         panel.clear();
-        Box box = new Box(1,1,1);
+        Box box = new Box(1,1,1,Color.red);
+        scene.addSolid(box);
+        Tetrahedron tet = new Tetrahedron(Color.yellow);
+        scene.addSolid(tet);
+
+
+
         Mat4 rotX = new Mat4RotX(tempX);
         Mat4 rotY = new Mat4RotY(tempY);
         renderer.setModel(rotX.mul(rotY));
-        renderer.renderSolid(box);
+        renderer.render(scene);
 
     }
 

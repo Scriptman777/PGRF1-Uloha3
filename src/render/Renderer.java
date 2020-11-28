@@ -6,6 +6,7 @@ import model.Vertex;
 import rasterize.LineRasterizer;
 import rasterize.LineRasterizerGraphics;
 import rasterize.Raster;
+import solids.Axis;
 import transforms.Mat4;
 import transforms.Mat4Identity;
 import transforms.Vec3D;
@@ -30,10 +31,11 @@ public class Renderer {
         this.model = model;
     }
 
-    public void render(Scene scene, Raster raster) {
+    public void render(Scene scene) {
 
-        //TODO forach Solids, render dem
-        //renderSolid
+        for (Solid sol: scene.getSolids()) {
+            renderSolid(sol);
+        }
     }
 
     public void renderSolid(Solid solid) {
@@ -41,24 +43,35 @@ public class Renderer {
         //pohledová transformace
         //perspektiva/projekce - zobrazovací objem
 
-        Mat4 m = (model.mul(view)).mul(projection);
-        List<Vertex> transformedVerts = new ArrayList<>();
-        for (Vertex vert: solid.getVertices()) {
-            transformedVerts.add(vert.trasform(m));
+
+
+        if (solid instanceof Axis) {
+            //TODO
+
+        }
+        else {
+            //Transform
+            Mat4 m = (model.mul(view)).mul(projection);
+            List<Vertex> transformedVerts = new ArrayList<>();
+            for (Vertex vert: solid.getVertices()) {
+                transformedVerts.add(vert.trasform(m));
+            }
+
+            //Vykreslení hran
+            for(int i = 0; i < solid.getIndices().size(); i+=2) {
+                int indexA = solid.getIndices().get(i);
+                int indexB = solid.getIndices().get(i+1);
+                Vertex a = transformedVerts.get(indexA);
+                Vertex b = transformedVerts.get(indexB);
+                renderEdge(a,b,solid.getColor());
+            }
         }
 
-        //Vykreslení hran
-        for(int i = 0; i < solid.getIndices().size(); i+=2) {
-            int indexA = solid.getIndices().get(i);
-            int indexB = solid.getIndices().get(i+1);
-            Vertex a = transformedVerts.get(indexA);
-            Vertex b = transformedVerts.get(indexB);
-            renderEdge(a,b);
-        }
+
 
     }
 
-    private void renderEdge(Vertex a,Vertex b) {
+    private void renderEdge(Vertex a,Vertex b,Color color) {
 
         //Ořezání - fast clip
         //TODO
@@ -82,10 +95,8 @@ public class Renderer {
         int x2 = (int) ((vb.getX() + 1)*(raster.getWidth() - 1)/2);
         int y1 = (int) ((1 - va.getY())*(raster.getHeight() - 1)/2);
         int y2 = (int) ((1 - vb.getY())*(raster.getHeight() - 1)/2);
+        lineRasterizer.setColor(color);
         lineRasterizer.drawLine(x1,y1,x2,y2);
-
-
-
     }
 
 }

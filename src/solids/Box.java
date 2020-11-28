@@ -3,11 +3,13 @@ package solids;
 import model.Solid;
 import model.Vertex;
 
+import java.awt.*;
+
 public class Box extends Solid {
 
 
-    public Box(double a, double b, double c) {
-        super();
+    public Box(double a, double b, double c, Color color) {
+        super(color);
         //Dělení 2 hned na začátku aby s nemuselo provádět mnohokrát
         a = a/2;
         b = b/2;
