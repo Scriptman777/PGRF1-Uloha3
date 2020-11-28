@@ -6,9 +6,7 @@ import rasterize.*;
 import render.Renderer;
 import solids.Box;
 import solids.Tetrahedron;
-import transforms.Mat4;
-import transforms.Mat4RotX;
-import transforms.Mat4RotY;
+import transforms.*;
 import view.Panel;
 import view.Window;
 
@@ -22,11 +20,9 @@ public class Controller2D implements Controller {
     private final Window window;
     private Renderer renderer;
     private Scene scene;
+    Box box;
 
     private LineRasterizerGraphics rasterizer;
-
-    double tempX = 0;
-    double tempY = 0;
 
 
     public Controller2D(Window window) {
@@ -39,9 +35,15 @@ public class Controller2D implements Controller {
     }
 
     public void initObjects(Raster raster) {
+        box = new Box(1,1,1,Color.red);
+        Tetrahedron tet = new Tetrahedron(Color.yellow);
+        scene = new Scene();
+        scene.addSolid(box);
+        scene.addSolid(tet);
+
         rasterizer = new LineRasterizerGraphics(raster);
         renderer = new render.Renderer(rasterizer,raster);
-        scene = new Scene();
+
 
      }
 
@@ -64,14 +66,14 @@ public class Controller2D implements Controller {
 
     Action rotX = new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
-            tempX += 0.1;
+            box.setRotX(box.getRotX()+0.1);
             update();
         }
     };
 
     Action rotY = new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
-            tempY += 0.1;
+            box.setRotY(box.getRotY()+0.1);
             update();
         }
     };
@@ -112,16 +114,6 @@ public class Controller2D implements Controller {
 
     private void update() {
         panel.clear();
-        Box box = new Box(1,1,1,Color.red);
-        scene.addSolid(box);
-        Tetrahedron tet = new Tetrahedron(Color.yellow);
-        scene.addSolid(tet);
-
-
-
-        Mat4 rotX = new Mat4RotX(tempX);
-        Mat4 rotY = new Mat4RotY(tempY);
-        renderer.setModel(rotX.mul(rotY));
         renderer.render(scene);
 
     }

@@ -42,7 +42,7 @@ public class Renderer {
         //modelovací transformace - posun/otočení etc
         //pohledová transformace
         //perspektiva/projekce - zobrazovací objem
-
+        setModel(solid.getTransform());
 
 
         if (solid instanceof Axis) {
