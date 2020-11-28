@@ -7,6 +7,9 @@ public class Window extends JFrame {
 
     private final Panel panel;
 
+    private JLabel lblSelected;
+    private JPanel info;
+
 
 
 
@@ -17,11 +20,15 @@ public class Window extends JFrame {
 
         panel = new Panel();
 
+        info = new JPanel();
+        lblSelected = new JLabel("Selected modes will appear here");
+        info.add(lblSelected);
 
 
 
 
 
+        add(info, BorderLayout.SOUTH);
         add(panel, BorderLayout.CENTER);
         setVisible(true);
         pack();
@@ -46,7 +53,7 @@ public class Window extends JFrame {
     }
 
 
-
-
-
+    public JLabel getLblSelected() {
+        return lblSelected;
+    }
 }
