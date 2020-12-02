@@ -7,6 +7,10 @@ import rasterize.*;
 import render.Renderer;
 import solids.Box;
 import solids.Tetrahedron;
+import transforms.Mat4OrthoRH;
+import transforms.Mat4PerspRH;
+import transforms.Mat4ViewRH;
+import transforms.Vec3D;
 import view.Panel;
 import view.Window;
 
@@ -291,6 +295,8 @@ public class Controller2D implements Controller {
 
     private void update() {
         panel.clear();
+        renderer.setProjection(new Mat4OrthoRH(5,5,0.1,10));
+        //renderer.setView(new Mat4ViewRH(new Vec3D(-5,0,0),new Vec3D(1,0,0),new Vec3D(0,0,1)));
         renderer.render(scene);
 
 
