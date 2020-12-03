@@ -9,6 +9,7 @@ import rasterize.Raster;
 import solids.Axis;
 import transforms.Mat4;
 import transforms.Mat4Identity;
+import transforms.Point3D;
 import transforms.Vec3D;
 
 import java.awt.*;
@@ -31,6 +32,14 @@ public class Renderer {
         this.model = model;
     }
 
+    public void setProjection(Mat4 projection){
+        this.projection = projection;
+    }
+
+    public void setView(Mat4 view) {
+        this.view = view;
+    }
+
     public void render(Scene scene) {
 
         for (Solid sol: scene.getSolids()) {
@@ -47,7 +56,6 @@ public class Renderer {
 
         if (solid instanceof Axis) {
             //TODO
-
         }
         else {
             //Transform
@@ -74,6 +82,8 @@ public class Renderer {
     private void renderEdge(Vertex a,Vertex b,Color color) {
 
         //Ořezání - fast clip
+        if (!isInView(a) | !isInView(b)) { return; }
+
         //TODO
 
         //Dehomogenizace
@@ -87,16 +97,23 @@ public class Renderer {
             vb = b.getPosition().dehomog().get();
         }
 
-        //Projekce
-        //Viewport transform
-        //vykreslení LineRasterizerem
 
+
+        //Viewport transform
         int x1 = (int) ((va.getX() + 1)*(raster.getWidth() - 1)/2);
         int x2 = (int) ((vb.getX() + 1)*(raster.getWidth() - 1)/2);
         int y1 = (int) ((1 - va.getY())*(raster.getHeight() - 1)/2);
         int y2 = (int) ((1 - vb.getY())*(raster.getHeight() - 1)/2);
+        //vykreslení LineRasterizerem
         lineRasterizer.setColor(color);
         lineRasterizer.drawLine(x1,y1,x2,y2);
+    }
+
+    private boolean isInView(Vertex a) {
+        Point3D pos = a.getPosition();
+        return (-pos.getW() <= pos.getX()) && (pos.getY() <= pos.getW()) && (0 <= pos.getZ()) && (pos.getZ() <= pos.getW());
+
+
     }
 
 }

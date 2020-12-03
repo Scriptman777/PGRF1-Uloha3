@@ -6,11 +6,9 @@ import model.Solid;
 import rasterize.*;
 import render.Renderer;
 import solids.Box;
+import solids.Circle;
 import solids.Tetrahedron;
-import transforms.Mat4OrthoRH;
-import transforms.Mat4PerspRH;
-import transforms.Mat4ViewRH;
-import transforms.Vec3D;
+import transforms.*;
 import view.Panel;
 import view.Window;
 
@@ -18,7 +16,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class Controller2D implements Controller {
+public class Controller3D implements Controller {
 
     private final int ROTATE = 0;
     private final int TRANSLATE = 1;
@@ -29,6 +27,7 @@ public class Controller2D implements Controller {
     private final Window window;
     private final JLabel lblInfo;
     private Renderer renderer;
+    private Camera camera;
     private Scene scene;
     private int selector = 0;
     private int transformSelector = 0;
@@ -37,7 +36,7 @@ public class Controller2D implements Controller {
     private LineRasterizerGraphics rasterizer;
 
 
-    public Controller2D(Window window) {
+    public Controller3D(Window window) {
         this.window = window;
         this.panel = window.getPanel();
         this.lblInfo = window.getLblSelected();
@@ -45,18 +44,26 @@ public class Controller2D implements Controller {
         initObjects(panel.getRaster());
         initListeners(panel);
         initInputs();
+        update();
     }
 
     public void initObjects(Raster raster) {
         Box box = new Box(1,1,1,Color.red);
         Tetrahedron tet = new Tetrahedron(Color.cyan);
+        Circle cir = new Circle(Color.LIGHT_GRAY);
         scene = new Scene();
         scene.addSolid(box);
         scene.addSolid(tet);
+        scene.addSolid(cir);
 
         tempColor = scene.getSolids().get(selector).getColor();
         rasterizer = new LineRasterizerGraphics(raster);
         renderer = new render.Renderer(rasterizer,raster);
+        camera = new Camera()
+                .withAzimuth(0)
+                .withZenith(0)
+                .withPosition(new Vec3D(-5,0,0));
+
 
         updateInfo();
      }
@@ -65,22 +72,22 @@ public class Controller2D implements Controller {
         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("C"), "clear");
         panel.getActionMap().put("clear",clear);
 
-         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("W"), "moveX");
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD8,0), "moveX");
          panel.getActionMap().put("moveX",moveX);
 
-         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("D"), "moveY");
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD6,0), "moveY");
          panel.getActionMap().put("moveY",moveY);
 
-         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("S"), "moveXinv");
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD5,0), "moveXinv");
          panel.getActionMap().put("moveXinv",moveXinv);
 
-         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("A"), "moveYinv");
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD4,0), "moveYinv");
          panel.getActionMap().put("moveYinv",moveYinv);
 
-         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("E"), "moveZ");
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD9,0), "moveZ");
          panel.getActionMap().put("moveZ",moveZ);
 
-         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("Q"), "moveZinv");
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD7,0), "moveZinv");
          panel.getActionMap().put("moveZinv",moveZinv);
 
          panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("RIGHT"), "nextSolid");
@@ -94,7 +101,49 @@ public class Controller2D implements Controller {
 
          panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DOWN"), "previousTransform");
          panel.getActionMap().put("previousTransform",previousTransform);
+
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("W"), "cameraForward");
+         panel.getActionMap().put("cameraForward",cameraForward);
+
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("S"), "cameraBack");
+         panel.getActionMap().put("cameraBack",cameraBack);
+
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("A"), "cameraLeft");
+         panel.getActionMap().put("cameraLeft",cameraLeft);
+
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("D"), "cameraRight");
+         panel.getActionMap().put("cameraRight",cameraRight);
+
+
      }
+
+    Action cameraForward = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            camera = camera.forward(0.1);
+            update();
+        }
+    };
+
+    Action cameraBack = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            camera = camera.backward(0.1);
+            update();
+        }
+    };
+
+    Action cameraLeft = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            camera = camera.left(0.1);
+            update();
+        }
+    };
+
+    Action cameraRight = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            camera = camera.right(0.1);
+            update();
+        }
+    };
 
     Action nextTransform = new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
@@ -155,13 +204,13 @@ public class Controller2D implements Controller {
         public void actionPerformed(ActionEvent e) {
             Solid selected = scene.getSolids().get(selector);
             switch (transformSelector){
-                case 0:
+                case ROTATE:
                     selected.setRotX(selected.getRotX()+0.1);
                     break;
-                case 1:
+                case TRANSLATE:
                     selected.setTransX(selected.getTransX()+0.1);
                     break;
-                case 2:
+                case SCALE:
                     selected.setScaleX(selected.getScaleX()+0.1);
                     break;
             }
@@ -173,13 +222,13 @@ public class Controller2D implements Controller {
         public void actionPerformed(ActionEvent e) {
             Solid selected = scene.getSolids().get(selector);
             switch (transformSelector){
-                case 0:
+                case ROTATE:
                     selected.setRotY(selected.getRotY()+0.1);
                     break;
-                case 1:
+                case TRANSLATE:
                     selected.setTransY(selected.getTransY()+0.1);
                     break;
-                case 2:
+                case SCALE:
                     selected.setScaleY(selected.getScaleY()+0.1);
                     break;
             }
@@ -191,13 +240,13 @@ public class Controller2D implements Controller {
         public void actionPerformed(ActionEvent e) {
             Solid selected = scene.getSolids().get(selector);
             switch (transformSelector){
-                case 0:
+                case ROTATE:
                     selected.setRotX(selected.getRotX()-0.1);
                     break;
-                case 1:
+                case TRANSLATE:
                     selected.setTransX(selected.getTransX()-0.1);
                     break;
-                case 2:
+                case SCALE:
                     selected.setScaleX(selected.getScaleX()-0.1);
                     break;
             }
@@ -209,13 +258,13 @@ public class Controller2D implements Controller {
         public void actionPerformed(ActionEvent e) {
             Solid selected = scene.getSolids().get(selector);
             switch (transformSelector){
-                case 0:
+                case ROTATE:
                     selected.setRotY(selected.getRotY()-0.1);
                     break;
-                case 1:
+                case TRANSLATE:
                     selected.setTransY(selected.getTransY()-0.1);
                     break;
-                case 2:
+                case SCALE:
                     selected.setScaleY(selected.getScaleY()-0.1);
                     break;
             }
@@ -227,13 +276,13 @@ public class Controller2D implements Controller {
         public void actionPerformed(ActionEvent e) {
             Solid selected = scene.getSolids().get(selector);
             switch (transformSelector){
-                case 0:
+                case ROTATE:
                     selected.setRotZ(selected.getRotZ()+0.1);
                     break;
-                case 1:
+                case TRANSLATE:
                     selected.setTransZ(selected.getTransZ()+0.1);
                     break;
-                case 2:
+                case SCALE:
                     selected.setScaleZ(selected.getScaleZ()+0.1);
                     break;
             }
@@ -245,13 +294,13 @@ public class Controller2D implements Controller {
         public void actionPerformed(ActionEvent e) {
             Solid selected = scene.getSolids().get(selector);
             switch (transformSelector){
-                case 0:
+                case ROTATE:
                     selected.setRotZ(selected.getRotZ()-0.1);
                     break;
-                case 1:
+                case TRANSLATE:
                     selected.setTransZ(selected.getTransZ()-0.1);
                     break;
-                case 2:
+                case SCALE:
                     selected.setScaleZ(selected.getScaleZ()-0.1);
                     break;
             }
@@ -263,22 +312,14 @@ public class Controller2D implements Controller {
     @Override
     public void initListeners(Panel panel) {
 
-
-
-        panel.addMouseListener(new MouseAdapter() {
-
+        panel.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isControlDown()) return;
+            public void mouseMoved(MouseEvent e) {
 
-                if (e.isShiftDown()) {
+                camera = camera.withAzimuth(((Math.PI*e.getX())/panel.getRaster().getWidth())-Math.PI/2);
+                camera = camera.withZenith((Math.PI*e.getY())/(panel.getRaster().getHeight())-Math.PI/2);
+                update();
 
-                } else if (SwingUtilities.isLeftMouseButton(e)) {
-                    update();
-
-
-
-                }
             }
         });
 
@@ -295,8 +336,9 @@ public class Controller2D implements Controller {
 
     private void update() {
         panel.clear();
-        renderer.setProjection(new Mat4OrthoRH(5,5,0.1,10));
-        //renderer.setView(new Mat4ViewRH(new Vec3D(-5,0,0),new Vec3D(1,0,0),new Vec3D(0,0,1)));
+        //renderer.setProjection(new Mat4OrthoRH(5,5,0.1,10));
+        renderer.setProjection(new Mat4PerspRH(Math.PI/2, 1,0.1,10));
+        renderer.setView(camera.getViewMatrix());
         renderer.render(scene);
 
 
@@ -305,13 +347,13 @@ public class Controller2D implements Controller {
 
     private void updateInfo() {
         switch (transformSelector){
-            case 0:
+            case ROTATE:
                 lblInfo.setText("Rotate");
                 break;
-            case 1:
+            case TRANSLATE:
                 lblInfo.setText("Translate");
                 break;
-            case 2:
+            case SCALE:
                 lblInfo.setText("Scale");
                 break;
         }
