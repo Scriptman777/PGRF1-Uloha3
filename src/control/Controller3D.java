@@ -5,10 +5,8 @@ import model.Scene;
 import model.Solid;
 import rasterize.*;
 import render.Renderer;
+import solids.*;
 import solids.Box;
-import solids.Circle;
-import solids.Curve;
-import solids.Tetrahedron;
 import transforms.*;
 import view.Panel;
 import view.Window;
@@ -23,7 +21,6 @@ public class Controller3D implements Controller {
     private final int TRANSLATE = 1;
     private final int SCALE = 2;
 
-
     private final Panel panel;
     private final Window window;
     private final JLabel lblInfo;
@@ -31,6 +28,7 @@ public class Controller3D implements Controller {
     private Camera camera;
     private Scene scene;
     private int selector = 0;
+    private boolean projectionSelector = true;
     private int transformSelector = 0;
     private Color tempColor;
 
@@ -58,11 +56,13 @@ public class Controller3D implements Controller {
         Tetrahedron tet = new Tetrahedron(Color.cyan);
         Circle cir = new Circle(Color.LIGHT_GRAY);
         Curve cur = new Curve(Color.green);
+        Axis axis = new Axis();
         scene = new Scene();
         scene.addSolid(box);
         scene.addSolid(tet);
         scene.addSolid(cir);
         scene.addSolid(cur);
+        scene.addSolid(axis);
 
         tempColor = scene.getSolids().get(selector).getColor();
         rasterizer = new LineRasterizerGraphics(raster);
@@ -122,8 +122,19 @@ public class Controller3D implements Controller {
          panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("D"), "cameraRight");
          panel.getActionMap().put("cameraRight",cameraRight);
 
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("P"), "changeProj");
+         panel.getActionMap().put("changeProj",changeProj);
+
 
      }
+
+    Action changeProj = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            projectionSelector = !projectionSelector;
+            update();
+        }
+    };
+
 
     Action cameraForward = new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
@@ -344,8 +355,14 @@ public class Controller3D implements Controller {
 
     private void update() {
         panel.clear();
-        //renderer.setProjection(new Mat4OrthoRH(5,5,0.1,10));
-        renderer.setProjection(new Mat4PerspRH(Math.PI/2, 1,0.1,10));
+
+        if (projectionSelector){
+            renderer.setProjection(new Mat4PerspRH(Math.PI/2, 1,0.1,10));
+        }
+        else {
+            renderer.setProjection(new Mat4OrthoRH(5,5,0.1,10));
+        }
+
         renderer.setView(camera.getViewMatrix());
         renderer.render(scene);
 

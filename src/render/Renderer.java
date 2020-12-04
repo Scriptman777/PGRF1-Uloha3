@@ -55,7 +55,12 @@ public class Renderer {
 
 
         if (solid instanceof Axis) {
-            //TODO
+            Mat4 m = view.mul(projection);
+            List<Vertex> transformedVerts = new ArrayList<>();
+            for (Vertex vert: solid.getVertices()) {
+                transformedVerts.add(vert.trasform(m));
+            }
+            renderAxis(transformedVerts);
         }
         else {
             //Transform
@@ -79,12 +84,18 @@ public class Renderer {
 
     }
 
+    private void renderAxis(List<Vertex> axis) {
+        renderEdge(axis.get(0),axis.get(1),Color.RED);
+        renderEdge(axis.get(0),axis.get(2),Color.GREEN);
+        renderEdge(axis.get(0),axis.get(3),Color.BLUE);
+
+    }
+
     private void renderEdge(Vertex a,Vertex b,Color color) {
 
         //Ořezání - fast clip
         if (!isInView(a) | !isInView(b)) { return; }
 
-        //TODO
 
         //Dehomogenizace
         Vec3D va = new Vec3D();
