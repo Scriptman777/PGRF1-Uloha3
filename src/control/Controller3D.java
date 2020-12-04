@@ -7,6 +7,7 @@ import rasterize.*;
 import render.Renderer;
 import solids.Box;
 import solids.Circle;
+import solids.Curve;
 import solids.Tetrahedron;
 import transforms.*;
 import view.Panel;
@@ -33,6 +34,11 @@ public class Controller3D implements Controller {
     private int transformSelector = 0;
     private Color tempColor;
 
+    private double mouseXdiff = 0;
+    private double mouseYdiff = 0;
+    private int mouseOldX = 0;
+    private int mouseOldY = 0;
+
     private LineRasterizerGraphics rasterizer;
 
 
@@ -51,10 +57,12 @@ public class Controller3D implements Controller {
         Box box = new Box(1,1,1,Color.red);
         Tetrahedron tet = new Tetrahedron(Color.cyan);
         Circle cir = new Circle(Color.LIGHT_GRAY);
+        Curve cur = new Curve(Color.green);
         scene = new Scene();
         scene.addSolid(box);
         scene.addSolid(tet);
         scene.addSolid(cir);
+        scene.addSolid(cur);
 
         tempColor = scene.getSolids().get(selector).getColor();
         rasterizer = new LineRasterizerGraphics(raster);
@@ -315,11 +323,11 @@ public class Controller3D implements Controller {
         panel.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-
-                camera = camera.withAzimuth(((Math.PI*e.getX())/panel.getRaster().getWidth())-Math.PI/2);
-                camera = camera.withZenith((Math.PI*e.getY())/(panel.getRaster().getHeight())-Math.PI/2);
+                int centX = panel.getRaster().getWidth();
+                int centY = panel.getRaster().getHeight();
+                camera = camera.withAzimuth(((Math.PI*(centX - e.getX()))/panel.getRaster().getWidth())-Math.PI/2);
+                camera = camera.withZenith((Math.PI*(centY - e.getY()))/(panel.getRaster().getHeight())-Math.PI/2);
                 update();
-
             }
         });
 
