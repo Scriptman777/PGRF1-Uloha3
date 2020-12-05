@@ -10,7 +10,7 @@ public class Box extends Solid {
 
     public Box(double a, double b, double c, Color color) {
         super(color);
-        //Dělení 2 hned na začátku aby s nemuselo provádět mnohokrát
+        //Dělení 2 hned na začátku aby se nemuselo provádět mnohokrát
         a = a/2;
         b = b/2;
         c = c/2;

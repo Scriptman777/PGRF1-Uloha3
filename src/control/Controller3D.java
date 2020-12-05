@@ -20,6 +20,7 @@ import java.util.Random;
 
 public class Controller3D implements Controller {
 
+    //Konstanty pro transforms
     private final int ROTATE = 0;
     private final int TRANSLATE = 1;
     private final int SCALE = 2;
@@ -30,13 +31,15 @@ public class Controller3D implements Controller {
     private Renderer renderer;
     private Camera camera;
     private Scene scene;
+    //Vybírá těleso
     private int selector = 0;
+    //Vybírá projekci
     private boolean projectionSelector = true;
+    //Vybírá transformaci
     private int transformSelector = 0;
     private Color tempColor;
     private List<Color> colorList = new ArrayList<Color>();
     private Random rnd = new Random();
-
     private LineRasterizerGraphics rasterizer;
 
 
@@ -53,6 +56,7 @@ public class Controller3D implements Controller {
     }
 
     public void initObjects(Raster raster) {
+        // Defaultní scéna
         Box box = new Box(1,1,1,Color.red);
         Tetrahedron tet = new Tetrahedron(Color.cyan);
         Circle cir = new Circle(Color.LIGHT_GRAY);
@@ -65,6 +69,7 @@ public class Controller3D implements Controller {
         scene.addSolid(cur);
         scene.addSolid(axis);
 
+        //List barev pro přidání náhodně obarveného tělesa
         colorList.add(Color.BLUE);
         colorList.add(Color.RED);
         colorList.add(Color.CYAN);
@@ -72,6 +77,7 @@ public class Controller3D implements Controller {
         colorList.add(Color.WHITE);
         colorList.add(Color.MAGENTA);
 
+        // tempColor existuje pro zvýrazňování výběru
         tempColor = scene.getSolids().get(selector).getColor();
         rasterizer = new LineRasterizerGraphics(raster);
         renderer = new render.Renderer(rasterizer,raster);
@@ -85,8 +91,11 @@ public class Controller3D implements Controller {
      }
 
      public void initInputs() {
-        panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("C"), "clear");
-        panel.getActionMap().put("clear",clear);
+
+        //Namapování všech tlačítek
+
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("C"), "clear");
+         panel.getActionMap().put("clear",clear);
 
          panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD8,0), "moveX");
          panel.getActionMap().put("moveX",moveX);
@@ -144,6 +153,8 @@ public class Controller3D implements Controller {
 
 
      }
+
+     //Všechny akce tlačítek
 
     Action addCube = new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
@@ -369,9 +380,13 @@ public class Controller3D implements Controller {
     @Override
     public void initListeners(Panel panel) {
 
+        //Listener pro rozhlížení se myší
+
         panel.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
+                //Velmi zjednodušené rozhlížení myší - možné rozšíření: skrytí myši a její periodický přesun do středu obrazovky pro neomezené otáčení
+
                 int centX = panel.getRaster().getWidth();
                 int centY = panel.getRaster().getHeight();
                 camera = camera.withAzimuth(((Math.PI*(centX - e.getX()))/panel.getRaster().getWidth())-Math.PI/2);
@@ -392,6 +407,7 @@ public class Controller3D implements Controller {
     }
 
     private void update() {
+        //Překleslení při změně scény
         panel.clear();
 
         if (projectionSelector){
@@ -409,6 +425,7 @@ public class Controller3D implements Controller {
     }
 
     private void updateInfo() {
+        //Změna textu oznamujícího název transformace
         switch (transformSelector){
             case ROTATE:
                 lblInfo.setText("Rotate");
@@ -424,6 +441,7 @@ public class Controller3D implements Controller {
     }
 
     private void hardClear() {
+        //Založení nové scény
         scene = new Scene();
         scene.addSolid(new Axis());
         scene.addSolid(new Box(1,1,1,Color.RED));
@@ -433,7 +451,8 @@ public class Controller3D implements Controller {
     }
 
     private void showHelpDialog() {
-        JOptionPane.showMessageDialog(window, "H - zobrazení této nápovědy\nWASD - pohyb kamery\nMyš - rozhlížení\nŠipky ↑↓ - výběr transformace\nŠipky ←→ - výběr tělesa (zvýrazní se žlutě) \nNumpad 85/46/79 - transformace vybraného tělesa podél osy X/Y/Z\nP - změna projekce \nK - nová krychle \nL - nový čtyřstěn\nC - nová scéna", "Ovládání",JOptionPane.INFORMATION_MESSAGE);
+        //Dialog vysvětlující ovládání programu
+        JOptionPane.showMessageDialog(window, "H - zobrazení této nápovědy\nWASD - pohyb kamery\nMyš - rozhlížení\nŠipky ↑↓ - výběr transformace (název se zobrazuje na liště)\nŠipky ←→ - výběr tělesa (zvýrazní se žlutě, je možné nemít vybraný žádné těleso) \nNumpad 85/46/79 - transformace vybraného tělesa podél osy X/Y/Z\nP - změna projekce \nK - nová krychle \nL - nový čtyřstěn\nC - nová scéna", "Ovládání",JOptionPane.INFORMATION_MESSAGE);
     }
 
 

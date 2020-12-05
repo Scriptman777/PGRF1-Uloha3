@@ -3,7 +3,6 @@ package render;
 import model.Scene;
 import model.Solid;
 import model.Vertex;
-import rasterize.LineRasterizer;
 import rasterize.LineRasterizerGraphics;
 import rasterize.Raster;
 import solids.Axis;
@@ -55,6 +54,7 @@ public class Renderer {
 
 
         if (solid instanceof Axis) {
+            //U os se nepoužíva modelovací transformace a vykreslí se barevně - mají tudíž vlastní metodu
             Mat4 m = view.mul(projection);
             List<Vertex> transformedVerts = new ArrayList<>();
             for (Vertex vert: solid.getVertices()) {
@@ -85,6 +85,7 @@ public class Renderer {
     }
 
     private void renderAxis(List<Vertex> axis) {
+        //Vykreslení os
         renderEdge(axis.get(0),axis.get(1),Color.RED);
         renderEdge(axis.get(0),axis.get(2),Color.GREEN);
         renderEdge(axis.get(0),axis.get(3),Color.BLUE);
@@ -121,6 +122,7 @@ public class Renderer {
     }
 
     private boolean isInView(Vertex a) {
+        //Rychlé ořezání dle přednásky
         Point3D pos = a.getPosition();
         return (-pos.getW() <= pos.getX()) && (pos.getY() <= pos.getW()) && (0 <= pos.getZ()) && (pos.getZ() <= pos.getW());
 

@@ -9,6 +9,10 @@ import java.awt.*;
 
 public class Curve extends Solid {
 
+    /*
+    Solid "Curve" není pouze křivka, jedná se o "plochu" složenou ze tří křivek a čar spojujících jejich body - jakýsi wireframe
+     */
+
     public Curve(Color color) {
         super(color);
         Cubic cub = new Cubic(Cubic.BEZIER,new Point3D(0,1,1),new Point3D(0,2,1),new Point3D(1,2,0),new Point3D(1,2,1));

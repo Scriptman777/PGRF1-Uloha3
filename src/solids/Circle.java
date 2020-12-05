@@ -23,9 +23,6 @@ public class Circle extends Solid {
         getIndices().add(getVertices().size()-1);
 
 
-
-
-
     }
 
 }

@@ -8,6 +8,10 @@ import java.util.List;
 
 public class Solid {
 
+    /*
+    Solid obsahuje body, indexy barvu a všechny hodnoty trasformace, ze kterých se skládá transformační matice
+     */
+
     private List<Vertex> vertices;
     private List<Integer> indices;
     private Color color;
@@ -29,8 +33,6 @@ public class Solid {
 
     //Transform
     private Mat4 transform;
-
-
 
 
 
