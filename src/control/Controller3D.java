@@ -14,6 +14,9 @@ import view.Window;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Controller3D implements Controller {
 
@@ -31,11 +34,8 @@ public class Controller3D implements Controller {
     private boolean projectionSelector = true;
     private int transformSelector = 0;
     private Color tempColor;
-
-    private double mouseXdiff = 0;
-    private double mouseYdiff = 0;
-    private int mouseOldX = 0;
-    private int mouseOldY = 0;
+    private List<Color> colorList = new ArrayList<Color>();
+    private Random rnd = new Random();
 
     private LineRasterizerGraphics rasterizer;
 
@@ -49,6 +49,7 @@ public class Controller3D implements Controller {
         initListeners(panel);
         initInputs();
         update();
+        showHelpDialog();
     }
 
     public void initObjects(Raster raster) {
@@ -63,6 +64,13 @@ public class Controller3D implements Controller {
         scene.addSolid(cir);
         scene.addSolid(cur);
         scene.addSolid(axis);
+
+        colorList.add(Color.BLUE);
+        colorList.add(Color.RED);
+        colorList.add(Color.CYAN);
+        colorList.add(Color.GREEN);
+        colorList.add(Color.WHITE);
+        colorList.add(Color.MAGENTA);
 
         tempColor = scene.getSolids().get(selector).getColor();
         rasterizer = new LineRasterizerGraphics(raster);
@@ -83,13 +91,13 @@ public class Controller3D implements Controller {
          panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD8,0), "moveX");
          panel.getActionMap().put("moveX",moveX);
 
-         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD6,0), "moveY");
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD4,0), "moveY");
          panel.getActionMap().put("moveY",moveY);
 
          panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD5,0), "moveXinv");
          panel.getActionMap().put("moveXinv",moveXinv);
 
-         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD4,0), "moveYinv");
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD6,0), "moveYinv");
          panel.getActionMap().put("moveYinv",moveYinv);
 
          panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_NUMPAD9,0), "moveZ");
@@ -125,14 +133,44 @@ public class Controller3D implements Controller {
          panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("P"), "changeProj");
          panel.getActionMap().put("changeProj",changeProj);
 
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("H"), "showHelp");
+         panel.getActionMap().put("showHelp",showHelp);
+
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("K"), "addCube");
+         panel.getActionMap().put("addCube",addCube);
+
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("L"), "addTetra");
+         panel.getActionMap().put("addTetra",addTetra);
+
 
      }
+
+    Action addCube = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            scene.addSolid(new Box(1,1,1,colorList.get(rnd.nextInt(colorList.size()))));
+            update();
+        }
+    };
+
+    Action addTetra = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            scene.addSolid(new Tetrahedron(colorList.get(rnd.nextInt(colorList.size()))));
+            update();
+        }
+    };
+
 
     Action changeProj = new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
             projectionSelector = !projectionSelector;
             update();
         }
+    };
+
+    Action showHelp = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            showHelpDialog();
+          }
     };
 
 
@@ -386,8 +424,16 @@ public class Controller3D implements Controller {
     }
 
     private void hardClear() {
-        panel.clear();
+        scene = new Scene();
+        scene.addSolid(new Axis());
+        scene.addSolid(new Box(1,1,1,Color.RED));
+        selector = 0;
+        update();
 
+    }
+
+    private void showHelpDialog() {
+        JOptionPane.showMessageDialog(window, "H - zobrazení této nápovědy\nWASD - pohyb kamery\nMyš - rozhlížení\nŠipky ↑↓ - výběr transformace\nŠipky ←→ - výběr tělesa (zvýrazní se žlutě) \nNumpad 85/46/79 - transformace vybraného tělesa podél osy X/Y/Z\nP - změna projekce \nK - nová krychle \nL - nový čtyřstěn\nC - nová scéna", "Ovládání",JOptionPane.INFORMATION_MESSAGE);
     }
 
 
