@@ -60,14 +60,24 @@ public class Controller3D implements Controller {
         Box box = new Box(1,1,1,Color.red);
         Tetrahedron tet = new Tetrahedron(Color.cyan);
         Circle cir = new Circle(Color.LIGHT_GRAY);
-        Curve cur = new Curve(Color.green);
+        Curve curB = new Curve(Color.green,Cubic.BEZIER);
+        Curve curC = new Curve(Color.cyan,Cubic.COONS);
+        curC.setTransY(-2.5);
+        Curve curF = new Curve(Color.magenta,Cubic.FERGUSON);
+        curF.setTransY(-5);
+        Pyramid pyr = new Pyramid(Color.cyan);
+        pyr.setTransX(3);
+
         Axis axis = new Axis();
         scene = new Scene();
         scene.addSolid(box);
         scene.addSolid(tet);
         scene.addSolid(cir);
-        scene.addSolid(cur);
+        scene.addSolid(curB);
+        scene.addSolid(curF);
+        scene.addSolid(curC);
         scene.addSolid(axis);
+        scene.addSolid(pyr);
 
         //List barev pro přidání náhodně obarveného tělesa
         colorList.add(Color.BLUE);
