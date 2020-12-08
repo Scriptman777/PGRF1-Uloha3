@@ -66,9 +66,12 @@ public class Controller3D implements Controller {
         Curve curF = new Curve(Color.magenta,Cubic.FERGUSON);
         curF.setTransY(-5);
         Pyramid pyr = new Pyramid(Color.cyan);
-        pyr.setTransX(3);
+        pyr.setTransY(3);
+        Octahedron dia = new Octahedron(Color.BLUE);
+        dia.setTransY(-3);
 
         Axis axis = new Axis();
+
         scene = new Scene();
         scene.addSolid(box);
         scene.addSolid(tet);
@@ -78,6 +81,7 @@ public class Controller3D implements Controller {
         scene.addSolid(curC);
         scene.addSolid(axis);
         scene.addSolid(pyr);
+        scene.addSolid(dia);
 
         //List barev pro přidání náhodně obarveného tělesa
         colorList.add(Color.BLUE);
@@ -161,10 +165,30 @@ public class Controller3D implements Controller {
          panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("L"), "addTetra");
          panel.getActionMap().put("addTetra",addTetra);
 
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("J"), "addPyramid");
+         panel.getActionMap().put("addPyramid",addPyramid);
+
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("O"), "addOctahedron");
+         panel.getActionMap().put("addOctahedron",addOctahedron);
+
 
      }
 
      //Všechny akce tlačítek
+
+    Action addOctahedron = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            scene.addSolid(new Octahedron(colorList.get(rnd.nextInt(colorList.size()))));
+            update();
+        }
+    };
+
+    Action addPyramid = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            scene.addSolid(new Pyramid(colorList.get(rnd.nextInt(colorList.size()))));
+            update();
+        }
+    };
 
     Action addCube = new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
@@ -462,7 +486,7 @@ public class Controller3D implements Controller {
 
     private void showHelpDialog() {
         //Dialog vysvětlující ovládání programu
-        JOptionPane.showMessageDialog(window, "H - zobrazení této nápovědy\nWASD - pohyb kamery\nMyš - rozhlížení\nŠipky ↑↓ - výběr transformace (název se zobrazuje na liště)\nŠipky ←→ - výběr tělesa (zvýrazní se žlutě, je možné nemít vybraný žádné těleso) \nNumpad 85/46/79 - transformace vybraného tělesa podél osy X/Y/Z\nP - změna projekce \nK - nová krychle \nL - nový čtyřstěn\nC - nová scéna", "Ovládání",JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(window, "H - zobrazení této nápovědy\nWASD - pohyb kamery\nMyš - rozhlížení\nŠipky ↑↓ - výběr transformace (název se zobrazuje na liště)\nŠipky ←→ - výběr tělesa (zvýrazní se žlutě, je možné nemít vybraný žádné těleso) \nNumpad 85/46/79 - transformace vybraného tělesa podél osy X/Y/Z\nP - změna projekce \nK - nová krychle \nL - nový čtyřstěn\nJ - nový jehlan\nO - nový oktahedron\nC - nová scéna", "Ovládání",JOptionPane.INFORMATION_MESSAGE);
     }
 
 
