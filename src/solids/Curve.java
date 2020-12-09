@@ -38,7 +38,7 @@ public class Curve extends Solid {
             }
         }
 
-        for (int c = 0; c < 19; c++){
+        for (int c = 0; c < 20; c++){
             getIndices().add(c);
             getIndices().add(c+20);
             getIndices().add(c+20);

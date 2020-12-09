@@ -16,6 +16,7 @@ public class Solid {
     private List<Integer> indices;
     private Color color;
 
+    /*
     //Transforms - Rotation
     private double rotX = 0;
     private double rotY = 0;
@@ -29,7 +30,7 @@ public class Solid {
     //Transforms - Scale
     private double scaleX = 1;
     private double scaleY = 1;
-    private double scaleZ = 1;
+    private double scaleZ = 1;*/
 
     //Transform
     private Mat4 transform;
@@ -59,6 +60,7 @@ public class Solid {
         this.color = color;
     }
 
+    /*
     public double getRotX() {
         return rotX;
     }
@@ -147,10 +149,14 @@ public class Solid {
         Mat4 rotat = new Mat4RotXYZ(rotX,rotY,rotZ);
         transform = scale.mul(trans).mul(rotat);
 
-    }
+    }*/
 
     public Mat4 getTransform(){
         return transform;
+    }
+
+    public void setTransform(Mat4 transform){
+        this.transform = transform;
     }
 
 

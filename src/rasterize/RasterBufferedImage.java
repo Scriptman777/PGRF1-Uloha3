@@ -13,7 +13,7 @@ public class RasterBufferedImage implements Raster {
     }
 
     public RasterBufferedImage(int width, int height) {
-        // inicializace image, nastavení rozmìrù (nastavení typu - pro nás nedùležité)
+        // inicializace image, nastavenï¿½ rozmï¿½rï¿½ (nastavenï¿½ typu - pro nï¿½s nedï¿½leï¿½itï¿½)
         img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
     }
 
@@ -39,14 +39,17 @@ public class RasterBufferedImage implements Raster {
 
     @Override
     public void setPixel(int x, int y, int color) {
-           img.setRGB(x, y, color);
+           if(x<0 || x>img.getWidth() || y<0 || y>img.getHeight()) {
+               return;
+           }
+        img.setRGB(x, y, color);
     }
 
     @Override
     public void clear() {
         Graphics g = img.getGraphics();
         g.setColor(new Color(color));
-        g.clearRect(0, 0, img.getWidth() - 1, img.getHeight() - 1);
+        g.clearRect(0, 0, img.getWidth(), img.getHeight());
     }
 
     @Override

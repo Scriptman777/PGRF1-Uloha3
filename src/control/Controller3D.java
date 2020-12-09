@@ -62,14 +62,13 @@ public class Controller3D implements Controller {
         Circle cir = new Circle(Color.LIGHT_GRAY);
         Curve curB = new Curve(Color.green,Cubic.BEZIER);
         Curve curC = new Curve(Color.cyan,Cubic.COONS);
-        curC.setTransY(-2.5);
+        curC.setTransform(curC.getTransform().mul(new Mat4Transl(0,-4,0)));
         Curve curF = new Curve(Color.magenta,Cubic.FERGUSON);
-        curF.setTransY(-5);
+        curF.setTransform(curF.getTransform().mul(new Mat4Transl(0,2.5,0)));
         Pyramid pyr = new Pyramid(Color.cyan);
-        pyr.setTransY(3);
+        pyr.setTransform(pyr.getTransform().mul(new Mat4Transl(0,3,0)));
         Octahedron dia = new Octahedron(Color.BLUE);
-        dia.setTransY(-3);
-
+        dia.setTransform(dia.getTransform().mul(new Mat4Transl(0,-3,0)));
         Axis axis = new Axis();
 
         scene = new Scene();
@@ -302,36 +301,38 @@ public class Controller3D implements Controller {
         }
     };
 
+
     Action moveX = new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
             Solid selected = scene.getSolids().get(selector);
             switch (transformSelector){
                 case ROTATE:
-                    selected.setRotX(selected.getRotX()+0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4RotX(0.1)));
                     break;
                 case TRANSLATE:
-                    selected.setTransX(selected.getTransX()+0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4Transl(0.1,0,0)));
                     break;
                 case SCALE:
-                    selected.setScaleX(selected.getScaleX()+0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4Scale(1.1,1,1)));
                     break;
             }
             update();
         }
     };
 
+
     Action moveY = new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
             Solid selected = scene.getSolids().get(selector);
             switch (transformSelector){
                 case ROTATE:
-                    selected.setRotY(selected.getRotY()+0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4RotY(0.1)));
                     break;
                 case TRANSLATE:
-                    selected.setTransY(selected.getTransY()+0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4Transl(0,0.1,0)));
                     break;
                 case SCALE:
-                    selected.setScaleY(selected.getScaleY()+0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4Scale(1,1.1,1)));
                     break;
             }
             update();
@@ -343,13 +344,13 @@ public class Controller3D implements Controller {
             Solid selected = scene.getSolids().get(selector);
             switch (transformSelector){
                 case ROTATE:
-                    selected.setRotX(selected.getRotX()-0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4RotX(-0.1)));
                     break;
                 case TRANSLATE:
-                    selected.setTransX(selected.getTransX()-0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4Transl(-0.1,0,0)));
                     break;
                 case SCALE:
-                    selected.setScaleX(selected.getScaleX()-0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4Scale(0.9,1,1)));
                     break;
             }
             update();
@@ -361,13 +362,13 @@ public class Controller3D implements Controller {
             Solid selected = scene.getSolids().get(selector);
             switch (transformSelector){
                 case ROTATE:
-                    selected.setRotY(selected.getRotY()-0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4RotY(-0.1)));
                     break;
                 case TRANSLATE:
-                    selected.setTransY(selected.getTransY()-0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4Transl(0,-0.1,0)));
                     break;
                 case SCALE:
-                    selected.setScaleY(selected.getScaleY()-0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4Scale(1,0.9,1)));
                     break;
             }
             update();
@@ -379,13 +380,13 @@ public class Controller3D implements Controller {
             Solid selected = scene.getSolids().get(selector);
             switch (transformSelector){
                 case ROTATE:
-                    selected.setRotZ(selected.getRotZ()+0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4RotZ(0.1)));
                     break;
                 case TRANSLATE:
-                    selected.setTransZ(selected.getTransZ()+0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4Transl(0,0,0.1)));
                     break;
                 case SCALE:
-                    selected.setScaleZ(selected.getScaleZ()+0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4Scale(1,1,1.1)));
                     break;
             }
             update();
@@ -397,18 +398,20 @@ public class Controller3D implements Controller {
             Solid selected = scene.getSolids().get(selector);
             switch (transformSelector){
                 case ROTATE:
-                    selected.setRotZ(selected.getRotZ()-0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4RotZ(-0.1)));
                     break;
                 case TRANSLATE:
-                    selected.setTransZ(selected.getTransZ()-0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4Transl(0,0,-0.1)));
                     break;
                 case SCALE:
-                    selected.setScaleZ(selected.getScaleZ()-0.1);
+                    selected.setTransform(selected.getTransform().mul(new Mat4Scale(1,1,0.9)));
                     break;
             }
             update();
         }
     };
+
+
 
 
     @Override
