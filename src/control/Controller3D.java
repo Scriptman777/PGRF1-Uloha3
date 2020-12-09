@@ -1,6 +1,8 @@
 package control;
 
 
+import anim.Animator;
+import anim.Updater;
 import model.Scene;
 import model.Solid;
 import rasterize.*;
@@ -17,6 +19,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.TimerTask;
 
 public class Controller3D implements Controller {
 
@@ -41,6 +44,8 @@ public class Controller3D implements Controller {
     private List<Color> colorList = new ArrayList<Color>();
     private Random rnd = new Random();
     private LineRasterizerGraphics rasterizer;
+    private Animator ani;
+    private Updater updater;
 
 
     public Controller3D(Window window) {
@@ -70,6 +75,10 @@ public class Controller3D implements Controller {
         Octahedron dia = new Octahedron(Color.BLUE);
         dia.setTransform(dia.getTransform().mul(new Mat4Transl(0,-3,0)));
         Axis axis = new Axis();
+
+        ani = new Animator(box);
+        ani.startThread();
+
 
         scene = new Scene();
         scene.addSolid(box);
@@ -101,6 +110,9 @@ public class Controller3D implements Controller {
 
 
         updateInfo();
+
+        updater = new Updater(this);
+        updater.startThread();
      }
 
      public void initInputs() {
@@ -170,10 +182,21 @@ public class Controller3D implements Controller {
          panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("O"), "addOctahedron");
          panel.getActionMap().put("addOctahedron",addOctahedron);
 
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("I"), "animate");
+         panel.getActionMap().put("animate",animate);
+
 
      }
 
      //Všechny akce tlačítek
+
+    Action animate = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            Animator animator = new Animator(scene.getSolids().get(selector));
+            animator.startThread();
+
+        }
+    };
 
     Action addOctahedron = new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
@@ -443,7 +466,7 @@ public class Controller3D implements Controller {
         });
     }
 
-    private void update() {
+    public void update() {
         //Překleslení při změně scény
         panel.clear();
 
@@ -456,8 +479,6 @@ public class Controller3D implements Controller {
 
         renderer.setView(camera.getViewMatrix());
         renderer.render(scene);
-
-
 
     }
 
@@ -479,6 +500,7 @@ public class Controller3D implements Controller {
 
     private void hardClear() {
         //Založení nové scény
+        ani.interrupt();
         scene = new Scene();
         scene.addSolid(new Axis());
         scene.addSolid(new Box(1,1,1,Color.RED));
@@ -489,7 +511,7 @@ public class Controller3D implements Controller {
 
     private void showHelpDialog() {
         //Dialog vysvětlující ovládání programu
-        JOptionPane.showMessageDialog(window, "H - zobrazení této nápovědy\nWASD - pohyb kamery\nMyš - rozhlížení\nŠipky ↑↓ - výběr transformace (název se zobrazuje na liště)\nŠipky ←→ - výběr tělesa (zvýrazní se žlutě, je možné nemít vybraný žádné těleso) \nNumpad 85/46/79 - transformace vybraného tělesa podél osy X/Y/Z\nP - změna projekce \nK - nová krychle \nL - nový čtyřstěn\nJ - nový jehlan\nO - nový oktahedron\nC - nová scéna", "Ovládání",JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(window, "H - zobrazení této nápovědy\nWASD - pohyb kamery\nMyš - rozhlížení\nŠipky ↑↓ - výběr transformace (název se zobrazuje na liště)\nŠipky ←→ - výběr tělesa (zvýrazní se žlutě, je možné nemít vybraný žádné těleso) \nNumpad 85/46/79 - transformace vybraného tělesa podél osy X/Y/Z\nP - změna projekce\nI - animovat vybrané těleso \nK - nová krychle \nL - nový čtyřstěn\nJ - nový jehlan\nO - nový oktahedron\nC - nová scéna", "Ovládání",JOptionPane.INFORMATION_MESSAGE);
     }
 
 
