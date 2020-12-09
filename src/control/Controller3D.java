@@ -44,7 +44,7 @@ public class Controller3D implements Controller {
     private List<Color> colorList = new ArrayList<Color>();
     private Random rnd = new Random();
     private LineRasterizerGraphics rasterizer;
-    private Animator ani;
+    private List<Animator> animatedSolids = new ArrayList<>();
     private Updater updater;
 
 
@@ -76,8 +76,12 @@ public class Controller3D implements Controller {
         dia.setTransform(dia.getTransform().mul(new Mat4Transl(0,-3,0)));
         Axis axis = new Axis();
 
-        ani = new Animator(box);
-        ani.startThread();
+        Animator aniCube = new Animator(box);
+        aniCube.startThread();
+        animatedSolids.add(aniCube);
+        Animator aniCircle = new Animator(cir);
+        aniCircle.startThread();
+        animatedSolids.add(aniCircle);
 
 
         scene = new Scene();
@@ -185,15 +189,25 @@ public class Controller3D implements Controller {
          panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("I"), "animate");
          panel.getActionMap().put("animate",animate);
 
+         panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("T"), "stopAll");
+         panel.getActionMap().put("stopAll",stopAll);
+
 
      }
 
      //Všechny akce tlačítek
 
+    Action stopAll = new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+            stopAllAnimations();
+        }
+    };
+
     Action animate = new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
             Animator animator = new Animator(scene.getSolids().get(selector));
             animator.startThread();
+            animatedSolids.add(animator);
 
         }
     };
@@ -500,7 +514,8 @@ public class Controller3D implements Controller {
 
     private void hardClear() {
         //Založení nové scény
-        ani.interrupt();
+        stopAllAnimations();
+        animatedSolids = new ArrayList<>();
         scene = new Scene();
         scene.addSolid(new Axis());
         scene.addSolid(new Box(1,1,1,Color.RED));
@@ -509,9 +524,15 @@ public class Controller3D implements Controller {
 
     }
 
+    private void stopAllAnimations() {
+            for (Animator ani : animatedSolids) {
+                ani.interrupt();
+            }
+    }
+
     private void showHelpDialog() {
         //Dialog vysvětlující ovládání programu
-        JOptionPane.showMessageDialog(window, "H - zobrazení této nápovědy\nWASD - pohyb kamery\nMyš - rozhlížení\nŠipky ↑↓ - výběr transformace (název se zobrazuje na liště)\nŠipky ←→ - výběr tělesa (zvýrazní se žlutě, je možné nemít vybraný žádné těleso) \nNumpad 85/46/79 - transformace vybraného tělesa podél osy X/Y/Z\nP - změna projekce\nI - animovat vybrané těleso \nK - nová krychle \nL - nový čtyřstěn\nJ - nový jehlan\nO - nový oktahedron\nC - nová scéna", "Ovládání",JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(window, "H - zobrazení této nápovědy\nWASD - pohyb kamery\nMyš - rozhlížení\nŠipky ↑↓ - výběr transformace (název se zobrazuje na liště)\nŠipky ←→ - výběr tělesa (zvýrazní se žlutě, je možné nemít vybraný žádné těleso) \nNumpad 85/46/79 - transformace vybraného tělesa podél osy X/Y/Z\nP - změna projekce\nI - animovat vybrané těleso\nT - zastavit všechny animace \nK - nová krychle \nL - nový čtyřstěn\nJ - nový jehlan\nO - nový oktahedron\nC - nová scéna", "Ovládání",JOptionPane.INFORMATION_MESSAGE);
     }
 
 

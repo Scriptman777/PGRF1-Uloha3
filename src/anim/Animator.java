@@ -1,10 +1,7 @@
 package anim;
 
-import control.Controller;
-import control.Controller3D;
+
 import model.Solid;
-import rasterize.Raster;
-import render.Renderer;
 import transforms.Mat4RotXYZ;
 
 public class Animator extends Thread {
@@ -23,14 +20,15 @@ public class Animator extends Thread {
 
     @Override
     public synchronized void run() {
-        while (true){
+        while (!Thread.interrupted()){
 
             solid.setTransform(solid.getTransform().mul(new Mat4RotXYZ(0.1,0.1,0)));
             try {
                 this.sleep(50);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                this.interrupt();
             }
+
 
         }
     }
